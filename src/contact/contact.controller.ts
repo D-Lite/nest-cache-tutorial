@@ -1,5 +1,5 @@
 import {
-  Body,
+  Body, CacheInterceptor, CacheKey, CacheTTL,
   Controller,
   Delete,
   Get,
@@ -9,9 +9,9 @@ import {
   Post,
   Put,
   Query,
-  Res,
-  ValidationPipe,
-} from '@nestjs/common';
+  Res, UseInterceptors,
+  ValidationPipe
+} from "@nestjs/common";
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 
@@ -25,6 +25,9 @@ export class ContactController {
     return res.status(HttpStatus.OK).json(contacts);
   }
 
+  @UseInterceptors(CacheInterceptor) // Automatically cache the response for this endpoint
+  @CacheKey('getcontact-key')
+  @CacheTTL(60000) // now in milliseconds (1 minute === 60000)
   @Get('contacts/:contactId')
   async getContact(
     @Res() res,
